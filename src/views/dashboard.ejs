@@ -1,0 +1,11 @@
+<%- include('page-start') %>
+<div class="page-head"><div><h1>Dashboard</h1><p class="muted">Ringkasan data monitoring tanaman.</p></div><div class="actions"><a class="btn btn-primary" href="/tanaman/baru">+ Tanaman</a><a class="btn" href="/jadwal/baru">+ Jadwal</a></div></div>
+<div class="stats">
+<div class="stat"><span>Total Tanaman</span><strong><%= totals.total %></strong></div><div class="stat"><span>Sehat</span><strong class="c-ok"><%= totals.Sehat %></strong></div><div class="stat"><span>Bermasalah</span><strong class="c-warn"><%= totals.Bermasalah %></strong></div><div class="stat"><span>Mati</span><strong class="c-bad"><%= totals.Mati %></strong></div><div class="stat"><span>Berbuah</span><strong class="c-ok"><%= totals.Berbuah %></strong></div><div class="stat"><span>Panen</span><strong class="c-ok"><%= totals.Panen %></strong></div><div class="stat"><span>Rata-rata Tinggi</span><strong><%= avgTinggi==null?'—':avgTinggi+' cm' %></strong></div>
+</div>
+<div class="grid-2">
+<section class="card"><h2>Pengamatan Terbaru</h2><% if(latestPeng.length){ %><ul class="mini-list"><% latestPeng.forEach(p=>{ %><li><a href="/tanaman/<%= p.tanaman_id %>"><strong><%= p.kode_tanaman %></strong></a><span class="muted"><%= p.tanggal %></span><span><%= p.catatan||('Daun: '+(p.kondisi_daun||'-')) %></span></li><% }) %></ul><% }else{ %><p class="muted">Belum ada data.</p><% } %></section>
+<section class="card"><h2>Perawatan Terbaru</h2><% if(latestRaw.length){ %><ul class="mini-list"><% latestRaw.forEach(r=>{ %><li><a href="/tanaman/<%= r.tanaman_id %>"><strong><%= r.kode_tanaman %></strong></a><span class="muted"><%= r.tanggal %></span><span><%= r.jenis_kegiatan %></span></li><% }) %></ul><% }else{ %><p class="muted">Belum ada data.</p><% } %></section>
+</div>
+<section class="card"><h2>Jadwal Terdekat</h2><% if(jadwal.length){ %><div class="table-wrap"><table class="table"><thead><tr><th>Tanggal</th><th>Kelas</th><th>Kegiatan</th><th>Petugas</th><th>Status</th></tr></thead><tbody><% jadwal.forEach(j=>{ %><tr><td><%= j.tanggal %></td><td><%= j.kode_kelas %></td><td><%= j.kegiatan %></td><td><%= j.petugas||'-' %></td><td><span class="badge"><%= j.status %></span></td></tr><% }) %></tbody></table></div><% }else{ %><p class="muted">Belum ada jadwal.</p><% } %></section>
+<%- include('page-end') %>

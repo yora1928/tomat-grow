@@ -1,0 +1,15 @@
+<%- include('page-start') %>
+<div class="page-head"><div><h1><%= mode==='create'?'Tambah':'Ubah' %> Tanaman</h1><p class="muted">Lengkapi identitas tanaman dengan data sebenarnya.</p></div></div>
+<% if(error){ %><div class="flash flash-danger"><%= error %></div><% } %>
+<form method="post" class="form-grid">
+<label>Kode Tanaman<input name="kode_tanaman" value="<%= data.kode_tanaman||'' %>" required placeholder="TG-XA-001"></label>
+<label>Nama Tanaman<input name="nama_tanaman" value="<%= data.nama_tanaman||'' %>" required placeholder="Tomat 01"></label>
+<label>Varietas<input name="varietas" value="<%= data.varietas||'' %>" placeholder="Contoh varietas"></label>
+<label>Tanggal Tanam<input type="date" name="tanggal_tanam" value="<%= data.tanggal_tanam||'' %>" required></label>
+<label>Kelas<select name="class_id" required><option value="">Pilih kelas</option><% classes.forEach(c=>{ %><option value="<%= c.id %>" <%= data.class_id==c.id?'selected':'' %>><%= c.kode_kelas %> — <%= c.nama_kelas %></option><% }) %></select></label>
+<label>Status<select name="status"><% ['Sehat','Bermasalah','Mati','Berbuah','Panen'].forEach(s=>{ %><option value="<%= s %>" <%= (data.status||'Sehat')===s?'selected':'' %>><%= s %></option><% }) %></select></label>
+<label>Lokasi<input name="lokasi" value="<%= data.lokasi||'' %>"></label><label>Posisi<input name="posisi" value="<%= data.posisi||'' %>"></label>
+<label class="col-2">Catatan<textarea name="catatan" rows="4"><%= data.catatan||'' %></textarea></label>
+<div class="col-2 form-actions"><button class="btn btn-primary">Simpan</button><a class="btn" href="<%= mode==='edit'?'/tanaman/'+data.id:'/tanaman' %>">Batal</a></div>
+</form>
+<%- include('page-end') %>

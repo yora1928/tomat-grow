@@ -1,0 +1,40 @@
+<%- include('page-start') %>
+<div class="page-head"><div><h1><%= t.kode_tanaman %> — <%= t.nama_tanaman %></h1><p class="muted"><%= t.kode_kelas||'-' %> · <%= t.varietas||'Varietas tidak dicatat' %> · Tanam <%= t.tanggal_tanam %></p></div><div class="actions"><% if(canEdit){ %><a class="btn" href="/tanaman/<%= t.id %>/edit">Ubah</a><% } %><a class="btn btn-primary" href="/pengamatan/baru?tanaman_id=<%= t.id %>">+ Pengamatan</a><a class="btn btn-primary" href="/pengukuran/baru?tanaman_id=<%= t.id %>">+ Pengukuran</a><a class="btn btn-primary" href="/perawatan/baru?tanaman_id=<%= t.id %>">+ Perawatan</a><a class="btn btn-primary" href="/dokumentasi/upload?tanaman_id=<%= t.id %>">+ Foto</a></div></div>
+<div class="stats"><div class="stat"><span>Status</span><strong><span class="badge status-<%= t.status.toLowerCase() %>"><%= t.status %></span></strong></div><div class="stat"><span>Tinggi Terakhir</span><strong><%= latest&&latest.tinggi_cm!=null?latest.tinggi_cm+' cm':'—' %></strong></div><div class="stat"><span>Daun</span><strong><%= latest&&latest.jumlah_daun!=null?latest.jumlah_daun:'—' %></strong></div><div class="stat"><span>Bunga</span><strong><%= latest&&latest.jumlah_bunga!=null?latest.jumlah_bunga:'—' %></strong></div><div class="stat"><span>Buah</span><strong><%= latest&&latest.jumlah_buah!=null?latest.jumlah_buah:'—' %></strong></div></div>
+<section class="card"><div class="section-head"><h2>Grafik Perkembangan</h2><span class="muted small"><%= chartLabels.length %> pengukuran</span></div><% if(chartLabels.length){ %><div class="chart-wrap"><canvas id="growth-chart"></canvas></div><% }else{ %><div class="empty">Belum ada pengukuran. Tambahkan pengukuran untuk melihat grafik.</div><% } %></section>
+<div class="grid-2">
+<section class="card"><h2>Pengamatan</h2><% if(pengamatan.length){ %><ul class="mini-list"><% pengamatan.forEach(p=>{ %><li><span class="muted"><%= p.tanggal %></span><span><%= p.catatan||('Daun: '+(p.kondisi_daun||'-')) %></span><a href="/pengamatan/<%= p.id %>/edit">Ubah</a><form method="post" action="/pengamatan/<%= p.id %>/delete" class="inline" onsubmit="return confirm('Hapus pengamatan ini?')"><button class="link-danger">Hapus</button></form></li><% }) %></ul><% }else{ %><p class="muted">Belum ada pengamatan.</p><% } %></section>
+<section class="card"><h2>Pengukuran</h2><% if(pengukuran.length){ %><div class="table-wrap"><table class="table"><thead><tr><th>Tanggal</th><th>Tinggi</th><th>Daun</th><th>Cabang</th><th>Bunga</th><th>Buah</th><th></th></tr></thead><tbody><% pengukuran.slice().reverse().forEach(u=>{ %><tr><td><%= u.tanggal %></td><td><%= u.tinggi_cm??'-' %></td><td><%= u.jumlah_daun??'-' %></td><td><%= u.jumlah_cabang??'-' %></td><td><%= u.jumlah_bunga??'-' %></td><td><%= u.jumlah_buah??'-' %></td><td class="right"><a href="/pengukuran/<%= u.id %>/edit">Ubah</a> <form method="post" action="/pengukuran/<%= u.id %>/delete" class="inline" onsubmit="return confirm('Hapus pengukuran ini?')"><button class="link-danger">Hapus</button></form></td></tr><% }) %></tbody></table></div><% }else{ %><p class="muted">Belum ada pengukuran.</p><% } %></section>
+</div>
+<div class="grid-2">
+<section class="card"><h2>Perawatan</h2><% if(perawatan.length){ %><ul class="mini-list"><% perawatan.forEach(r=>{ %><li><span class="muted"><%= r.tanggal %></span><strong><%= r.jenis_kegiatan %></strong><span><%= r.keterangan||'-' %></span><a href="/perawatan/<%= r.id %>/edit">Ubah</a><form method="post" action="/perawatan/<%= r.id %>/delete" class="inline" onsubmit="return confirm('Hapus perawatan ini?')"><button class="link-danger">Hapus</button></form></li><% }) %></ul><% }else{ %><p class="muted">Belum ada perawatan.</p><% } %></section>
+<section class="card"><h2>Dokumentasi</h2><% if(dokumentasi.length){ %><div class="photo-grid"><% dokumentasi.forEach(d=>{ %><figure class="card"><a href="/dokumentasi/file/<%= d.filename %>" target="_blank" rel="noopener"><img src="/dokumentasi/file/<%= d.filename %>" alt="Dokumentasi <%= t.kode_tanaman %>"></a><figcaption><strong><%= d.original_name||d.filename %></strong><br><span class="muted"><%= d.tanggal %></span><% if(d.keterangan){ %><br><%= d.keterangan %><% } %><br><a href="/dokumentasi/<%= d.id %>/edit">Ubah</a> <form method="post" action="/dokumentasi/<%= d.id %>/delete" class="inline" onsubmit="return confirm('Hapus dokumentasi ini?')"><button class="link-danger">Hapus</button></form></figcaption></figure><% }) %></div><% }else{ %><p class="muted">Belum ada dokumentasi.</p><% } %></section>
+</div>
+<section class="card"><h2>Timeline Aktivitas</h2><% if(timeline.length){ %><ul class="timeline"><% timeline.forEach(i=>{ %><li><span class="tl-date"><%= i.tanggal %></span><span class="tl-type"><%= i.tipe %></span><span class="tl-text"><%= i.teks %></span></li><% }) %></ul><% }else{ %><p class="muted">Belum ada aktivitas.</p><% } %></section>
+<% if(chartLabels.length){ %>
+<script>
+(() => {
+  const canvas=document.getElementById('growth-chart'); if(!canvas) return;
+  const labels=<%- JSON.stringify(chartLabels) %>;
+  const series=[
+    {name:'Tinggi (cm)',values:<%- JSON.stringify(chartData.tinggi) %>},
+    {name:'Daun',values:<%- JSON.stringify(chartData.daun) %>},
+    {name:'Cabang',values:<%- JSON.stringify(chartData.cabang) %>},
+    {name:'Bunga',values:<%- JSON.stringify(chartData.bunga) %>},
+    {name:'Buah',values:<%- JSON.stringify(chartData.buah) %>}
+  ];
+  const dpr=window.devicePixelRatio||1;
+  function draw(){
+    const w=canvas.clientWidth||800,h=canvas.clientHeight||330;canvas.width=w*dpr;canvas.height=h*dpr;const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+    const pad={l:52,r:18,t:20,b:44};const vals=series.flatMap(s=>s.values).filter(v=>typeof v==='number'&&Number.isFinite(v));if(!vals.length)return;const min=0,max=Math.max(1,...vals);const innerW=w-pad.l-pad.r,innerH=h-pad.t-pad.b;
+    c.font='11px Arial';c.fillStyle='#708078';c.strokeStyle='#e8eeea';c.lineWidth=1;for(let i=0;i<=4;i++){const y=pad.t+innerH*i/4;c.beginPath();c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke();c.fillText(String(Math.round(max-(max*i/4)*10)/10),6,y+4)}
+    const pts=(arr)=>arr.map((v,i)=>({x:pad.l+(labels.length===1?innerW/2:innerW*i/(labels.length-1)),y:typeof v==='number'&&Number.isFinite(v)?pad.t+innerH*(1-v/max):null}));
+    const widths=['#1f5f3f','#4a7c59','#7b9b83','#b06a00','#8b3b00'];series.forEach((s,si)=>{const p=pts(s.values);c.strokeStyle=widths[si];c.lineWidth=2;let started=false;p.forEach(pt=>{if(!pt.y===null)return;});for(const pt of p){if(pt.y===null){started=false;continue;}if(!started){c.beginPath();c.moveTo(pt.x,pt.y);started=true;}else c.lineTo(pt.x,pt.y);}if(started)c.stroke();p.forEach(pt=>{if(pt.y===null)return;c.fillStyle=widths[si];c.beginPath();c.arc(pt.x,pt.y,3,0,Math.PI*2);c.fill();});});
+    c.fillStyle='#69766f';labels.forEach((lab,i)=>{const x=pad.l+(labels.length===1?innerW/2:innerW*i/(labels.length-1));c.save();c.translate(x,h-12);c.rotate(-.35);c.fillText(lab,-18,0);c.restore();});
+    let lx=pad.l;const ly=8;series.forEach((s,i)=>{c.fillStyle=widths[i];c.fillRect(lx,ly,10,10);c.fillStyle='#526057';c.fillText(s.name,lx+15,ly+9);lx+=c.measureText(s.name).width+38;});
+  }
+  window.addEventListener('resize',draw);draw();
+})();
+</script>
+<% } %>
+<%- include('page-end') %>

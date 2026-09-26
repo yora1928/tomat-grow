@@ -1,0 +1,7 @@
+</main>
+<script>
+document.querySelectorAll('.flash').forEach(el=>setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .35s';setTimeout(()=>el.remove(),350)},5000));
+document.querySelectorAll('.mobile-backdrop').forEach(el=>el.addEventListener('click',()=>{const cb=document.getElementById('nav-toggle');if(cb)cb.checked=false}));
+</script>
+</body>
+</html>

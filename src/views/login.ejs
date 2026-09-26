@@ -1,0 +1,12 @@
+<%- include('page-start') %>
+<div class="login-wrap"><div class="login-card">
+<div class="login-brand"><span class="mark mark-lg">TG</span><h1><%= appName %></h1><p><%= appSubtitle %></p></div>
+<% if(error){ %><div class="flash flash-danger"><%= error %></div><% } %>
+<form method="post" class="login-form" autocomplete="off">
+<label>Username atau Email<input name="identity" value="<%= identity %>" required autofocus></label>
+<label>Password<input type="password" name="password" required></label>
+<button class="btn btn-primary btn-block" style="min-height:44px">Masuk</button>
+</form>
+<% if(showHint){ %><div class="login-hint">Login awal: <strong><%= defUser %></strong> / <strong><%= defPass %></strong></div><% } %>
+</div></div>
+<%- include('page-end') %>
